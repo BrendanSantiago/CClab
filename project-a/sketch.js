@@ -4,6 +4,7 @@ Template for IMA's Creative Coding Lab
 Project A: Generative Creatures
 CCLaboratories Biodiversity Atlas 
 */
+//brendan
 let angle = 0;
 let rocket = 100;
 let rxSpeed = 10;
