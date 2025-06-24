@@ -9,16 +9,24 @@
   4. start coding your dancer inside the class that has been prepared for you.
   5. have fun.
 */
+let NUM_OF_PARTICLES = 10; // Decide the initial number of particles.
 
+let particles = [];
 let dancer;
-
+ 
 function setup() {
   // no adjustments in the setup function needed...
   let canvas = createCanvas(windowWidth, windowHeight);
   canvas.parent("p5-canvas-container");
 
+  colorMode(HSB);
   // ...except to adjust the dancer's name on the next line:
   dancer = new BrendanDancer(width / 2, height / 2);
+
+  // generate particles
+  for (let i = 0; i < NUM_OF_PARTICLES; i++) {
+    particles[i] = new Particle(random(width), random(height));
+  }
 }
 
 function draw() {
@@ -26,15 +34,38 @@ function draw() {
   background(0);
   drawFloor(); // for reference only
 
+//  if(mouseIsPressed ==true){
+
+//   for(let i = 0; i < numParticles; i++){
+//   particles.push(new Particle(mouseX,mouseY))
+// }
+//  }
+
+
+particles.push(   new Particle(-100, random(height) )   );
+
+
+for(let i = 0; i < particles.length; i++){
+    if(particles[i].onScreen == false){
+    particles.splice(i, 1);
+
+    }
+
+
+ }
+
+
+  for (let i = 0; i < particles.length; i++) {
+    let p = particles[i];
+    p.update();
+    p.display();
+  }
   dancer.update();
   dancer.display();
 
-  
 }
-function keyPressed() {
-  if (key == "a" || key == "A") dancer.triggerA();
-  else if (key == "d" || key == "D") dancer.triggerD();
-}
+
+    
 // You only code inside this class.
 // Start by giving the dancer your name, e.g. LeonDancer.
 class BrendanDancer {
@@ -190,17 +221,17 @@ class BrendanDancer {
 
   this.armSwing = 8;
    
-
-  }
+   }
+  
   drawReferenceShapes() {
-    noFill();
-    stroke(255, 0, 0);
+  //  noFill();
+  //  stroke(255, 0, 0);
     //line(-5, 0, 5, 0);
     //line(0, -5, 0, 5);
-    stroke(255);
-    rect(-100, -100, 200, 200);
-    fill(255);
-    stroke(0);
+   // stroke(255);
+   // rect(-100, -100, 200, 200);
+  //  fill(255);
+   // stroke(0);
   }
 
 }
@@ -230,4 +261,42 @@ function keyPressed(){
   }else if(key == "d"){
     dancer.triggerD()
   }
+  // else if(key == "p"){
+  //   dancer.triggerP()
+  // }
 }
+class Particle {
+  // constructor function
+  constructor(startX, startY) {
+    // properties (variables): particle's characteristics
+    this.x = startX;
+    this.y = startY;
+    //this.dia = 30;
+    this.dia = random(10, 30);
+    this.speedX = map(this.dia, 10, 30, 0.1, 2)
+    this.c = color(random(360), 255, 255)
+    this.onScreen = true;
+  }
+  // methods (functions): particle's behaviors
+  update() {
+    this.x += this.speedX
+   // this.speedX += 0.1;
+    // (add) 
+  }
+  display() {
+    // particle's appearance
+    push();
+    translate(this.x, this.y);
+    fill(this.c);
+    circle(0, 0, this.dia);
+    pop();
+  }
+  checkOnScreen(){
+    if(this.y > height){
+       this.onScreen = false;
+
+    }
+  }
+
+}
+
