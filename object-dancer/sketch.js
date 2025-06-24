@@ -31,7 +31,10 @@ function draw() {
 
   
 }
-
+function keyPressed() {
+  if (key == "a" || key == "A") dancer.triggerA();
+  else if (key == "d" || key == "D") dancer.triggerD();
+}
 // You only code inside this class.
 // Start by giving the dancer your name, e.g. LeonDancer.
 class BrendanDancer {
@@ -43,19 +46,28 @@ class BrendanDancer {
     // ..
     // ..
     this.yOffset = 0;
-    this.ySpeed = -12;
+    this.ySpeed = -9;
     this.gravity = 0.2;
     this.xOffset = 0;
     this.Xspeed = -19;
+    this.frame = 0;
+    this.armAngleLeft = 0;
+    this.armAngleRight = 0;
+    this.armSpeed = 0.1;
+    this.armSwing = 0.8;
   }
+  
+
   update() {
    //this.yOffset = sin(frameCount*0.1)*30
     // update properties here to achieve
     // your dancer's desired moves and behaviour
-
+    this.frame++;
     this.yOffset += this.ySpeed;
     this.xOffset += this.xSpeed;
     this.ySpeed += this.gravity;
+    this.armAngleLeft = sin(this.frame * this.armSpeed) * this.armSwing;
+    this.armAngleRight = cos(this.frame * this.armSpeed) * this.armSwing;
 
     if(this.yOffset > 0){
       this.yOffset = 0;
@@ -70,39 +82,60 @@ class BrendanDancer {
     translate(this.x, this.y + this.yOffset);
     // this.yOffset = sin(frameCount*0.1)*30
 
-     fill("lightblue")
+     
+    //body
+    fill("gold")
+    rect(-7, 10, 15, 60);
+    fill("grey");
+    circle(0, 35, 40);
+    fill("gold")
+    stroke("grey");
+    ellipse(0, 25, 70, 20);
+    
+   fill("lightblue")
      noStroke();
+     //head
     circle(0, 0, 40);
     ellipse(-20, -20, 10, 40);
     ellipse(20, -20, 10, 40);
     fill("black")
-    ellipse(0, 0, 20, 3);
+    //glasses
+    ellipse(0, -3, 20, 3);
     circle(-7, 0, 10);
     circle(7, 0, 10);
-    fill("lightblue")
-    rect(-5, 20, 10, 60);
-    circle(0, 35, 30);
-    ellipse(0, 25, 70, 10);
-    circle(-12, 80,  20);
-    circle(-12, 90,  20);
-    circle(12, 80,  20);
-    circle(12, 90, 20);
-    circle(-12, 100,  20);
-    circle(-12, 110,  20);
-    circle(12, 100,  20);
-    circle(12, 110, 20);
+
+    fill("gold")
+    circle(0, 80, 30);
+    ellipse(-10, 100, 20, 50);
+    ellipse(10, 100, 20, 50);
+    ellipse(-10, 130, 20, 50);
+    ellipse(10, 130, 20, 50);
+    //fill("red")
+    //circle(-12, 80,  20);
+    //circle(-12, 90,  20);
+    //fill("red")
+    //circle(12, 80,  20);
+    //circle(12, 90, 20);
+    //circle(-12, 100,  20);
+    //circle(-12, 110,  20);
+    //circle(12, 100,  20);
+    //circle(12, 110, 20);
+    // arms and legs
+    fill("gold")
      circle(27, 30,  20);
      circle(-27, 30,  20);
+     fill("grey")
      circle(27, 40,  15);
-     circle(-27, 40,  15);
-     circle(27, 50,  10);
-     circle(-27, 50,  10);
-    //circle(12, -20, 30);
+     circle(-27, 40, 15);
+     ellipse(27, 50, 15, 30);
+     ellipse(-27, 50, 15, 30);
+    
     // ******** //
     // ⬇️ draw your dancer from here ⬇️
 
 
-
+     this.drawArm(-27, 30, this.armAngleLeft);
+    this.drawArm(27, 30, this.armAngleRight);
 
 
 
@@ -121,12 +154,30 @@ class BrendanDancer {
   
      
   }
+
+  drawArm(x, y, rotationAngle) {
+    push();
+    translate(x, y);
+    rotate(rotationAngle);
+    // Shoulder
+    fill("gold");
+    circle(0, 0, 20);
+    // Upper arm
+    fill("grey");
+    circle(0, 10, 15);
+    // Forearm
+    ellipse(0, 20, 15, 30);
+    pop();
+  }
+
+
+
   triggerA(){
     // this function will be called when the "a" key is pressed.
     // your dancer should perform some kind of reaction (i.e. make a special move or gesture) 
     //this,ySpeed = -10;
-
     
+    this.armSwing = 1.6;
 
 
   }
@@ -137,7 +188,7 @@ class BrendanDancer {
     //arm
     
 
-  
+  this.armSwing = 8;
    
 
   }
