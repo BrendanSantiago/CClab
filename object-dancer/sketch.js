@@ -13,7 +13,12 @@ let NUM_OF_PARTICLES = 10; // Decide the initial number of particles.
 
 let particles = [];
 let dancer;
- 
+let port;
+let connectBtn;
+let str; //string from arduino
+let val; // array with sensor values
+
+
 function setup() {
   // no adjustments in the setup function needed...
   let canvas = createCanvas(windowWidth, windowHeight);
@@ -24,9 +29,25 @@ function setup() {
   dancer = new BrendanDancer(width / 2, height / 2);
 
   // generate particles
-  for (let i = 0; i < NUM_OF_PARTICLES; i++) {
-    particles[i] = new Particle(random(width), random(height));
+  // for (let i = 0; i < NUM_OF_PARTICLES; i++) {
+  //   particles[i] = new Particle(random(width), random(height));
+  // }
+
+port = createSerial();
+
+  // in setup, we can open ports we have used previously
+  // without user interaction
+  let usedPorts = usedSerialPorts();
+  if (usedPorts.length > 0) {
+    port.open(usedPorts[0], 57600);
   }
+
+  // any other ports can be opened via a dialog after
+  // user interaction (see connectBtnClick below)
+  connectBtn = createButton("Connect to Arduino");
+  connectBtn.position(20, 370);
+  connectBtn.mousePressed(connectBtnClick);
+
 }
 
 function draw() {
@@ -42,7 +63,7 @@ function draw() {
 //  }
 
 
-particles.push(   new Particle(-100, random(height) )   );
+// particles.push(   new Particle(-100, random(height) )   );
 
 
 for(let i = 0; i < particles.length; i++){
@@ -50,6 +71,8 @@ for(let i = 0; i < particles.length; i++){
     particles.splice(i, 1);
 
     }
+
+    
 
 
  }
@@ -63,6 +86,43 @@ for(let i = 0; i < particles.length; i++){
   dancer.update();
   dancer.display();
 
+
+
+  str = port.readUntil("\n");
+  //str = trim(str); //remove any empty space
+
+  if (str.length > 0) {
+    val = int(str.split(",")); //split the values if there is a comma in between and convert them into numbers
+
+    // you receive three values from arduino that are stored
+    // in the array called val
+    // the first value is a range, see it like this
+    fill(255)
+    text(val[0], 20, 20)
+    // the second and third value are either 0 or 1 and will most likely
+    // trigger your dancer's two special motions
+  
+    if (val[0] > 500) {
+      // trigger your particles, you will have to adjust the threshold in the if statements
+      for (let i = 0; i < NUM_OF_PARTICLES; i++) {
+        particles.push( new Particle(-50, random(height)) );
+      }
+    }
+    if (val[1] == 1) {
+      dancer.triggerA() 
+    }
+    if (val[2] == 1) {
+      dancer.triggerD()
+    }
+  }
+
+}
+function connectBtnClick() {
+  if (!port.opened()) {
+    port.open("Arduino", 57600);
+  } else {
+    port.close();
+  }
 }
 
     
@@ -101,11 +161,19 @@ class BrendanDancer {
     this.armAngleRight = cos(this.frame * this.armSpeed) * this.armSwing;
 
     if(this.yOffset > 0){
-      this.yOffset = 0;
+       
+    this.yOffset = 0;
+
+   
+    
+      //this.yOffset = 0;
     }
 
   }
   display() {
+   
+
+
     // the push and pop, along with the translate 
     // places your whole dancer object at this.x and this.y.
     // you may change its position on line 19 to see the effect.
@@ -115,6 +183,7 @@ class BrendanDancer {
 
      
     //body
+    stroke("white");
     fill("gold")
     rect(-7, 10, 15, 60);
     fill("grey");
@@ -135,6 +204,7 @@ class BrendanDancer {
     circle(-7, 0, 10);
     circle(7, 0, 10);
 
+    stroke("white");
     fill("gold")
     circle(0, 80, 30);
     ellipse(-10, 100, 20, 50);
@@ -261,9 +331,12 @@ function keyPressed(){
   }else if(key == "d"){
     dancer.triggerD()
   }
-  // else if(key == "p"){
-  //   dancer.triggerP()
-  // }
+  else if(key == "p"){
+    // dancer.triggerP()
+    for (let i = 0; i < NUM_OF_PARTICLES; i++) {
+        particles.push( new Particle(-50, random(height)) );
+      }
+  }
 }
 class Particle {
   // constructor function
@@ -298,5 +371,65 @@ class Particle {
     }
   }
 
+}
+function drawSteve(){
+
+     
+    //body
+    stroke("white");
+    fill("gold")
+    rect(-7, 10, 15, 60);
+    fill("grey");
+    circle(0, 35, 40);
+    fill("gold")
+    stroke("grey");
+    ellipse(0, 25, 70, 20);
+    
+   fill("lightblue")
+     noStroke();
+     //head
+    circle(0, 0, 40);
+    ellipse(-20, -20, 10, 40);
+    ellipse(20, -20, 10, 40);
+    fill("black")
+    //glasses
+    ellipse(0, -3, 20, 3);
+    circle(-7, 0, 10);
+    circle(7, 0, 10);
+
+    stroke("white");
+    fill("gold")
+    circle(0, 80, 30);
+    ellipse(-10, 100, 20, 50);
+    ellipse(10, 100, 20, 50);
+    ellipse(-10, 130, 20, 50);
+    ellipse(10, 130, 20, 50);
+    //fill("red")
+    //circle(-12, 80,  20);
+    //circle(-12, 90,  20);
+    //fill("red")
+    //circle(12, 80,  20);
+    //circle(12, 90, 20);
+    //circle(-12, 100,  20);
+    //circle(-12, 110,  20);
+    //circle(12, 100,  20);
+    //circle(12, 110, 20);
+    // arms and legs
+    fill("gold")
+     circle(27, 30,  20);
+     circle(-27, 30,  20);
+     fill("grey")
+     circle(27, 40,  15);
+     circle(-27, 40, 15);
+     ellipse(27, 50, 15, 30);
+     ellipse(-27, 50, 15, 30);
+
+}
+function connectBtnClick() {
+  if (!port.opened()) {
+    port.open("Arduino", 57600);
+  } else {
+    port.close();
+  }
 }
 
